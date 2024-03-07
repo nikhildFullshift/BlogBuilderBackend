@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model blog {
+  id    BigInt     @default(autoincrement()) @id
+  title String
+  description String
+  tags  String[]
+  author_id BigInt?
+  image String?
+  meta_description String?
+  status Int @default(0)
+  version version[]
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  published_at DateTime? 
+  is_deleted Boolean @default(false)
+  published_to_kb_url String?
+  published_to_web_url String?
+}
+
+model optionalFields {
+  id BigInt  @default(autoincrement()) @id
+  label String
+  value String
+  optionalId BigInt
+  optionalRelation optional @relation(fields: [optionalId], references: [id])
+}
+model optional{
+  id BigInt  @default(autoincrement()) @id
+  label String @unique()
+  name String
+  type String 
+  values optionalFields[]
+}
+
+model version{
+  id BigInt  @default(autoincrement()) @id
+  reviewer_user_id BigInt @default(123)
+  blog_version blog @relation(fields: [blog_id], references: [id])
+  blog_id BigInt
+  status Int @default(1) 
+  title String
+  description String
+  htmlFormat String @default("")
+  tags String[]
+  annotations annotation[]  @relation("Annotations")
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+model annotation{
+  id BigInt  @default(autoincrement()) @id
+  highlight_mark_id String 
+  description String
+  annotation_version version @relation("Annotations", fields: [version_id], references: [id])
+  version_id BigInt
+  position_y Int  // position of element from top
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  author_id BigInt?
+}

@@ -1,0 +1,38 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    hostname: postgres
+    environment:
+      POSTGRES_DB: blogService
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - blog-service-db:/var/lib/postgresql/data
+    networks:
+      - elk_blog-builder-backend
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    # volumes:
+    #   - user-service-pgadmin:/var/lib/pgadmin
+    networks:
+      - elk_blog-builder-backend
+
+volumes:
+  blog-service-db:
+
+networks:
+  elk_blog-builder-backend:
+    external: true
